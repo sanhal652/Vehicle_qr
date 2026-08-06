@@ -1,5 +1,5 @@
 import cors from "cors"
-
+import cookieParser from "cookie-parser"
 import express from "express"
 
 const app=express();
@@ -14,3 +14,5 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))   //to get data from u
 app.use(express.static("public"))   //to store images etc. 
 
 app.use(cookieParser())
+
+export {app}
