@@ -6,9 +6,9 @@ export const sendSms= async(mobile,otp)=>{
        const response = await axios.post(
             "https://www.fast2sms.com/dev/bulkV2",
             {
-                variables_values: otp, // OTP number
-                route: "otp",          // Fast2SMS default OTP route
-                numbers: mobile        // Target phone number
+                variables_values: otp, 
+                route: "otp",          
+                numbers: mobile        
             },
             {
                 headers: {
@@ -20,7 +20,7 @@ export const sendSms= async(mobile,otp)=>{
         if (response.data.return !== true) {
             throw new ApiError(
                 500, 
-                response.data.message || "Failed to deliver SMS via Fast2SMS"
+                response.data.message || "Failed to deliver SMS "
             );
         }
 

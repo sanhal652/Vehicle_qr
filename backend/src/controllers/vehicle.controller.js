@@ -39,16 +39,13 @@ const registerVehicle = asyncHandler(async (req, res) => {
 //getting  vehicle for scan for bystanders
 const getVehicleQr = asyncHandler(async (req, res) => {
   const { vehicleId } = req.params;
-  const getVehicle = await Vehicle.findById(vehicleId).select("-licenseNumber");
+  const getVehicle = await Vehicle.findById(vehicleId).select("-licenseNumber -mobile");
 
   if (!getVehicle) {
     throw new ApiError(404, "Vehicle Qr code not found");
   }
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, getVehicle, "Vehicle qr code fetched successfully"),
-    );
+  return res.status(200)
+    .json(new ApiResponse(200, getVehicle, "Vehicle qr code fetched successfully"),);
 });
 
 //generating qr code for vehicle for owner

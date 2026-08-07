@@ -20,6 +20,9 @@ app.use(cookieParser())
 //routes
 
 import vehicleRouter from "./routes/vehicle.routes.js";
+import otpRouter from "./routes/otp.routes.js";
 
 app.use("/api/vehicle",vehicleRouter);
+app.use("/api/otp",otpRouter);
+
 export {app}

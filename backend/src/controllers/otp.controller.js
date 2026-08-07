@@ -3,6 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {Otp} from "../models/otp.model.js";
 import crypto from "crypto";
+import { sendSms } from "../utils/sendSms.js";
+
 
 const sendOtp=asyncHandler(async(req,res)=>{
     const {mobile}=req.body;
@@ -27,3 +29,27 @@ const sendOtp=asyncHandler(async(req,res)=>{
         new ApiResponse(200, null, "OTP sent successfully to your mobile number")
     );
 })
+
+// verify otp and register vehicle
+const verifyOtp=asyncHandler(async(req,res)=>{
+    const {mobile,otp}=req.body;
+    if(!mobile || mobile.trim()==="" || !otp || otp.trim()===""){
+        throw new ApiError(400,"Mobile number and OTP are required");
+    }
+
+    const validOtp= await Otp.findOne({mobile,otp});
+    if(!validOtp){
+        throw new ApiError(400,"Invalid or expired OTP");
+    }
+
+    //delete the otp after verification
+     await Otp.deleteOne({_id:validOtp._id});
+
+    return res.status(200).json(
+        new ApiResponse(200, { isVerified: true }, "OTP verified successfully")
+    );
+
+
+})
+
+export {sendOtp,verifyOtp}
