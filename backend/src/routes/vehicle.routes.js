@@ -4,7 +4,7 @@ import {registerVehicle,getVehicleQr,generateVehicleQR} from '../controllers/veh
 const router=Router();
 
 router.route("/register").post(registerVehicle);
-router.route("/qr/:vehicleId").get(getVehicleQr);
+router.route("/scan/:vehicleId").get(getVehicleQr);
 router.route("/generate-qr/:vehicleId").get(generateVehicleQR);
 
 export default router;

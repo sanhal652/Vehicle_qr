@@ -15,4 +15,11 @@ app.use(express.static("public"))   //to store images etc.
 
 app.use(cookieParser())
 
+
+
+//routes
+
+import vehicleRouter from "./routes/vehicle.routes.js";
+
+app.use("/api/vehicle",vehicleRouter);
 export {app}
