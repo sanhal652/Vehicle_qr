@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import QRCode from "qrcode";
 import { Vehicle } from "../models/vehicle.model.js";
+import { initiateMaskedCall } from "../utils/sendMaskedCall.js";
 
 //register vehicle
 const registerVehicle = asyncHandler(async (req, res) => {
@@ -73,4 +74,32 @@ const generateVehicleQR = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerVehicle, getVehicleQr, generateVehicleQR };
+//initiating maskd call between owner and bystander
+const maskedCall= asyncHandler(async(req,res)=>{
+    const {vehicleId}=req.params;
+    const {bystanderMobile}=req.body;
+
+    if(!bystanderMobile || bystanderMobile.trim()===""){
+        throw new ApiError(400,"Your mobile number is required");
+      }
+    const cleanNumber = bystanderMobile.trim().replace(/\D/g, "");
+    if (cleanNumber.length !== 10) {
+        throw new ApiError(400, "Please provide a valid 10-digit mobile number");
+    }
+
+      const vehicle=await Vehicle.findById(vehicleId);
+      if(!vehicle){
+        throw new ApiError(404,"Vehicle not found");
+      }
+
+      if(!vehicle.mobile || vehicle.mobile.trim()===""){
+        throw new ApiError(400,"Vehicle owner mobile number not found");
+      }
+
+      await initiateMaskedCall(bystanderMobile,vehicle.mobile);
+
+      return res.status(200)
+      .json(new ApiResponse(200,null,"Connecting your call! Your phone will ring shortly to connect you with the owner."))
+})
+
+export { registerVehicle, getVehicleQr, generateVehicleQR, maskedCall };
