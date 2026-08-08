@@ -40,7 +40,7 @@ const registerVehicle = asyncHandler(async (req, res) => {
 //getting  vehicle for scan for bystanders
 const getVehicleQr = asyncHandler(async (req, res) => {
   const { vehicleId } = req.params;
-  const getVehicle = await Vehicle.findById(vehicleId).select("-licenseNumber -mobile");
+  const getVehicle = await Vehicle.findById(vehicleId).select("vehicleNumberPlate fullName");
 
   if (!getVehicle) {
     throw new ApiError(404, "Vehicle Qr code not found");
@@ -96,7 +96,7 @@ const maskedCall= asyncHandler(async(req,res)=>{
         throw new ApiError(400,"Vehicle owner mobile number not found");
       }
 
-      await initiateMaskedCall(bystanderMobile,vehicle.mobile);
+      await initiateMaskedCall(cleanNumber,vehicle.mobile);
 
       return res.status(200)
       .json(new ApiResponse(200,null,"Connecting your call! Your phone will ring shortly to connect you with the owner."))
