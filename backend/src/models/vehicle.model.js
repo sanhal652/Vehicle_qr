@@ -12,12 +12,11 @@ const vehicleSchema = new Schema(
         type:String,
         required:true
     },
-    licenseNumber:{
+    engineNumber:{
         type:String,
         required:true,
         unique: true,
         trim: true,
-        uppercase: true,
         index: true
     },
     vehicleNumberPlate:{

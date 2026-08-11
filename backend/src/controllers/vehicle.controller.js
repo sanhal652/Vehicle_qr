@@ -8,11 +8,11 @@ import { initiateMaskedCall } from "../utils/sendMaskedCall.js";
 //register vehicle
 const registerVehicle = asyncHandler(async (req, res) => {
   //get the details
-  const { fullName, mobile, licenseNumber, vehicleNumberPlate } = req.body;
+  const { fullName, mobile, engineNumber, vehicleNumberPlate } = req.body;
 
   //verify all the fields
   if (
-    [fullName, mobile, licenseNumber, vehicleNumberPlate].some(
+    [fullName, mobile, engineNumber, vehicleNumberPlate].some(
       (field) => !field || field.trim() === "",
     )
   ) {
@@ -20,7 +20,7 @@ const registerVehicle = asyncHandler(async (req, res) => {
   }
   //check already registered or not
   const existingVehicle = await Vehicle.findOne({
-    $or: [{ licenseNumber }, { vehicleNumberPlate }],
+    $or: [{ engineNumber }, { vehicleNumberPlate }],
   });
   if (existingVehicle) {
     throw new ApiError(409, "Vehicle already registered");
@@ -29,7 +29,7 @@ const registerVehicle = asyncHandler(async (req, res) => {
   const vehicle = await Vehicle.create({
     fullName,
     mobile,
-    licenseNumber,
+    engineNumber,
     vehicleNumberPlate,
   });
   return res
@@ -40,13 +40,31 @@ const registerVehicle = asyncHandler(async (req, res) => {
 //getting  vehicle for scan for bystanders
 const getVehicleQr = asyncHandler(async (req, res) => {
   const { vehicleId } = req.params;
-  const getVehicle = await Vehicle.findById(vehicleId).select("vehicleNumberPlate fullName");
+  const { lastFourDigits } = req.query;
 
-  if (!getVehicle) {
-    throw new ApiError(404, "Vehicle Qr code not found");
+  if (!lastFourDigits || lastFourDigits.trim() === "") {
+    throw new ApiError(400, "Please enter the last 4 digits of the vehicle number plate");
   }
-  return res.status(200)
-    .json(new ApiResponse(200, getVehicle, "Vehicle qr code fetched successfully"),);
+
+  const cleanDigits = lastFourDigits.trim();
+  if (!/^\d{4}$/.test(cleanDigits)) {
+    throw new ApiError(400, "Please enter exactly 4 digits");
+  }
+  const vehicle = await Vehicle.findById(vehicleId).select("vehicleNumberPlate fullName");
+  if (!vehicle) {
+    throw new ApiError(404, "Vehicle not found");
+  }
+  // extract last 4 digits from the stored plate (ignoring any non-digit chars)
+  const plateDigitsOnly = vehicle.vehicleNumberPlate.replace(/\D/g, "");
+  const actualLastFour = plateDigitsOnly.slice(-4);
+
+  if (cleanDigits !== actualLastFour) {
+    throw new ApiError(401, "Incorrect plate digits. Please check and try again.");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, vehicle, "Vehicle verified successfully"));
 });
 
 //generating qr code for vehicle for owner
@@ -74,32 +92,34 @@ const generateVehicleQR = asyncHandler(async (req, res) => {
     );
 });
 
-//initiating maskd call between owner and bystander
-const maskedCall= asyncHandler(async(req,res)=>{
-    const {vehicleId}=req.params;
-    const {bystanderMobile}=req.body;
+//initiating masked call between owner and bystander
+const maskedCall = asyncHandler(async (req, res) => {
+    const { vehicleId } = req.params;
+    const { bystanderMobile } = req.body || {};
 
-    if(!bystanderMobile || bystanderMobile.trim()===""){
-        throw new ApiError(400,"Your mobile number is required");
-      }
+    if (!bystanderMobile || bystanderMobile.trim() === "") {
+        throw new ApiError(400, "Your mobile number is required");
+    }
+
     const cleanNumber = bystanderMobile.trim().replace(/\D/g, "");
     if (cleanNumber.length !== 10) {
         throw new ApiError(400, "Please provide a valid 10-digit mobile number");
     }
 
-      const vehicle=await Vehicle.findById(vehicleId);
-      if(!vehicle){
-        throw new ApiError(404,"Vehicle not found");
-      }
+    const vehicle = await Vehicle.findById(vehicleId);
+    if (!vehicle) {
+        throw new ApiError(404, "Vehicle not found");
+    }
 
-      if(!vehicle.mobile || vehicle.mobile.trim()===""){
-        throw new ApiError(400,"Vehicle owner mobile number not found");
-      }
+    if (!vehicle.mobile || vehicle.mobile.trim() === "") {
+        throw new ApiError(400, "Vehicle owner mobile number not found");
+    }
 
-      await initiateMaskedCall(cleanNumber,vehicle.mobile);
+    await initiateMaskedCall(cleanNumber, vehicle.mobile);
 
-      return res.status(200)
-      .json(new ApiResponse(200,null,"Connecting your call! Your phone will ring shortly to connect you with the owner."))
-})
+    return res.status(200).json(
+    new ApiResponse(200, null, "Call initiated! Connecting you with the owner.")
+);
+});
 
 export { registerVehicle, getVehicleQr, generateVehicleQR, maskedCall };
