@@ -21,7 +21,7 @@ const sendOtp=asyncHandler(async(req,res)=>{
     })
 
     //send the sms to the mobile
-    await sendSms(mobile,generatedOtp);
+    await sendSms(mobile,generatedOtp,"otp");
 
     console.log(`OTP sent to ${mobile}: ${generatedOtp}`);
 
@@ -41,9 +41,8 @@ const verifyOtp=asyncHandler(async(req,res)=>{
     if(!validOtp){
         throw new ApiError(400,"Invalid or expired OTP");
     }
-
-    //delete the otp after verification
-     await Otp.deleteOne({_id:validOtp._id});
+    validOtp.isVerified=true;
+    await validOtp.save();
 
     return res.status(200).json(
         new ApiResponse(200, { isVerified: true }, "OTP verified successfully")

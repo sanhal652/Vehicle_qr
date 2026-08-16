@@ -12,6 +12,11 @@ const vehicleSchema = new Schema(
         type:String,
         required:true
     },
+    emergencyContact: {
+        type: String,
+        required: false,
+        trim: true,
+    },
     engineNumber:{
         type:String,
         required:true,
