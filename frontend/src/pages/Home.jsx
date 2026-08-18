@@ -11,8 +11,7 @@ export default function Home() {
         <h1 className="font-display text-3xl font-semibold text-ink mb-3">VehiQR</h1>
 
         <p className="text-ink/70 mb-8 leading-relaxed">
-          Stick a QR code on your car. If someone ever needs to reach you about
-          it, they scan it and you get notified — your number is never shared.
+          <b>"Honk less. Scan more."</b> Reach any car's owner instantly — privately, without exchanging numbers.
         </p>
 
         <Link
