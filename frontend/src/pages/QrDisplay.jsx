@@ -14,7 +14,6 @@ export default function QrDisplay() {
     async function fetchQr() {
       try {
         const res = await api.getVehicleQr(vehicleId);
-        // Correctly reading data.qrCode from ApiResponse
         if (!cancelled && res?.data?.qrCode) {
           setQrCode(res.data.qrCode);
         }
