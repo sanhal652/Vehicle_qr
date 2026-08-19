@@ -6,6 +6,7 @@ import Home from "./pages/Home.jsx";
 import Register from "./pages/Register.jsx";
 import QrDisplay from "./pages/QrDisplay.jsx";
 import Scan from "./pages/Scan.jsx";
+import RetrieveQr from "./pages/RetrieveQr.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/register" element={<Register />} />
         <Route path="/qr/:vehicleId" element={<QrDisplay />} />
         <Route path="/scan/:vehicleId" element={<Scan />} />
+        <Route path="/retrieve" element={<RetrieveQr />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {registerVehicle,getVehicleQr,generateVehicleQR,maskedCall,messageOwner,emergency} from '../controllers/vehicle.controller.js';
+import {registerVehicle,getVehicleQr,generateVehicleQR,maskedCall,messageOwner,emergency,getMyVehicle} from '../controllers/vehicle.controller.js';
 
 const router=Router();
 
@@ -9,5 +9,6 @@ router.route("/generate-qr/:vehicleId").get(generateVehicleQR);
 router.route("/masked-call/:vehicleId").post(maskedCall);
 router.route("/message-owner/:vehicleId").post(messageOwner)
 router.route("/emergency/:vehicleId").post(emergency)
+router.route("/my-vehicle") .get(getMyVehicle)
 
 export default router;

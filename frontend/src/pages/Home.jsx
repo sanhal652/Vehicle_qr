@@ -20,6 +20,12 @@ export default function Home() {
         >
           Register your vehicle
         </Link>
+        <Link
+          to="/retrieve"
+          className="block w-full mt-3 text-center text-primary font-medium py-3"
+        >
+          Already registered? Get your QR code
+        </Link>
       </div>
     </main>
   );

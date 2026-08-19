@@ -47,4 +47,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ bystanderMobile }),
     }),
+    getMyVehicle: (engineNumber, vehicleNumberPlate) =>
+    request(`/vehicle/my-vehicle?engineNumber=${encodeURIComponent(engineNumber)}&vehicleNumberPlate=${encodeURIComponent(vehicleNumberPlate)}`),
+    
 };

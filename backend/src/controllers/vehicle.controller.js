@@ -32,6 +32,11 @@ const registerVehicle = asyncHandler(async (req, res) => {
     $or: [{ engineNumber }, { vehicleNumberPlate }],
   });
   if (existingVehicle) {
+     if (existingVehicle.mobile === mobile) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, existingVehicle, "Vehicle already registered — here's your QR"));
+    }
     throw new ApiError(409, "Vehicle already registered");
   }
 
@@ -50,6 +55,25 @@ const registerVehicle = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, vehicle, "Vehicle registered successfully"));
 });
 
+
+//getting vehicle for owner
+const getMyVehicle= asyncHandler(async(req,res)=>{
+  const {vehicleNumberPlate, engineNumber} = req.query
+  if(!vehicleNumberPlate || !engineNumber){
+    throw new ApiError(400,"Both vehicle number plate and engine number are required")
+  }
+  const vehicle= await Vehicle.findOne({
+    vehicleNumberPlate:vehicleNumberPlate.trim().toUpperCase(),
+     engineNumber:engineNumber.trim()
+    }).select("-licenseNumber")
+
+  if(!vehicle){
+    throw new ApiError(404,"Vehicle not found")
+  }
+  return res.status(200).json(
+    new ApiResponse(200, vehicle, "Vehicle retrieved successfully")
+  )
+})
 //getting  vehicle for scan for bystanders
 const getVehicleQr = asyncHandler(async (req, res) => {
   const { vehicleId } = req.params;
@@ -214,4 +238,4 @@ const emergency= asyncHandler(async (req,res) => {
 
 
 
-export { registerVehicle, getVehicleQr, generateVehicleQR, maskedCall, messageOwner,emergency };
+export { registerVehicle, getVehicleQr, generateVehicleQR, maskedCall, messageOwner,emergency,getMyVehicle };
